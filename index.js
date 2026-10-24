@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits, MessageFlags } = require('discord.js');
-const { token } = require('./config.json');
+const token = process.env.DISCORD_TOKEN;
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -40,10 +40,19 @@ client.on(Events.InteractionCreate, async interaction => {
 		await command.execute(interaction);
 	} catch (error) {
 		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
-		} else {
-			await interaction.reply({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
+		const content = 'There was an error while executing this command!';
+		// Telling the user can fail too (e.g. the interaction expired), so don't let that crash the bot
+		try {
+			if (interaction.deferred && !interaction.replied) {
+				// Replace the "thinking..." message left by deferReply
+				await interaction.editReply({ content });
+			} else if (interaction.replied) {
+				await interaction.followUp({ content, flags: MessageFlags.Ephemeral });
+			} else {
+				await interaction.reply({ content, flags: MessageFlags.Ephemeral });
+			}
+		} catch (replyError) {
+			console.error('Failed to send error message:', replyError);
 		}
 	}
 });

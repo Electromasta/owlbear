@@ -1,10 +1,7 @@
-version: '3.8'
-
+# Local development. On the NAS the bot runs from the artemis repo (services/owlbear-bot).
+# Put DISCORD_TOKEN, DISCORD_CLIENT_ID and BRAVE_KEY in .env (git-ignored).
 services:
   owlbear-bot:
     build: .
-    container_name: owlbear-bot
-    volumes:
-      - /volume1/docker/config/owlbear/config.json:/app/config.json:ro # Mount config.json
-      - .:/app # Mount the entire project directory for live changes (optional, useful for development)
+    env_file: .env
     restart: unless-stopped

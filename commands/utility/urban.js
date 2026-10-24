@@ -1,5 +1,4 @@
 const { SlashCommandBuilder } = require('discord.js');
-const urban = require('urban');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -10,15 +9,24 @@ module.exports = {
       .setDescription('The Term to Search on')
       .setRequired(true)),
 	async execute(interaction) {
-    const term = interaction.options.getString('term') ?? 'No Term Provided';
+    const term = interaction.options.getString('term');
     console.log("/ud " + term);
 
-    let error = false;
+    // The API call can take longer than Discord's 3 second reply window
+    await interaction.deferReply();
+
     let reply = "No results found, hoot-hoot";
+    const res = await fetch('https://api.urbandictionary.com/v0/define?term=' + encodeURIComponent(term));
+    if (!res.ok) { throw new Error('Urban Dictionary returned ' + res.status); }
+    const json = await res.json();
 
-    await urban(term).first(async function(json) {
-      interaction.reply("From Urban Dictionary, " + term + ": " + json.definition);
+    if (json.list && json.list.length > 0) {
+      reply = "From Urban Dictionary, " + term + ": " + json.list[0].definition;
+      // Discord rejects messages over 2000 characters
+      if (reply.length > 2000) { reply = reply.slice(0, 1997) + "..."; }
+    }
 
-    });
+    // Don't let the term or definition ping @everyone, roles, or users
+		await interaction.editReply({ content: reply, allowedMentions: { parse: [] } });
 	},
 };

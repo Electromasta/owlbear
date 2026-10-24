@@ -10,14 +10,20 @@ module.exports = {
       .setDescription('The Term to Search on')
       .setRequired(true)),
 	async execute(interaction) {
-    const term = interaction.options.getString('term') ?? 'No Term Provided';
-    console.log("/yt" + term);
+    const term = interaction.options.getString('term');
+    console.log("/yt " + term);
 
-    let error = false;
+    // The search can take longer than Discord's 3 second reply window
+    await interaction.deferReply();
+
     let reply = "No results found, hoot-hoot";
+    const [video] = await youtube.search(term, { limit: 1, type: 'video' });
 
-    youtube.search(term, { limit: 1 })
-      .then((x) => interaction.reply('Youtube Results for ' + term + ': ' + 'https://www.youtube.com/watch?v=' + x[0].id))
-      .catch(console.error)
+    if (video) {
+      reply = 'Youtube Results for ' + term + ': ' + 'https://www.youtube.com/watch?v=' + video.id;
+    }
+
+    // Don't let the term ping @everyone, roles, or users
+		await interaction.editReply({ content: reply, allowedMentions: { parse: [] } });
 	},
 };

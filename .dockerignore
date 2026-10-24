@@ -1,0 +1,9 @@
+# Secrets are passed in at runtime via env_file, never baked into the image
+.env
+.env.*
+config.json
+
+# Installed fresh by npm inside the image
+node_modules
+
+.git
