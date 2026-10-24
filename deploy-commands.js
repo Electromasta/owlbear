@@ -43,5 +43,7 @@ const rest = new REST().setToken(token);
 	} catch (error) {
 		// And of course, make sure you catch and log any errors!
 		console.error(error);
+		// Non-zero exit so the deploy notices and doesn't start the bot with stale commands
+		process.exitCode = 1;
 	}
 })();
