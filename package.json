@@ -9,15 +9,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Electromasta/OwlbearBot.git"
+    "url": "git+https://github.com/Electromasta/owlbear.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Electromasta/OwlbearBot/issues"
-  },
-  "homepage": "https://github.com/Electromasta/OwlbearBot#readme",
+  "homepage": "https://github.com/Electromasta/owlbear#readme",
   "dependencies": {
     "discord.js": "^14.17.3",
     "urban": "^0.3.4",
